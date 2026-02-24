@@ -81,7 +81,7 @@ export function QuoteForm() {
 		}
 
 		return calculatePrice(glassType, parseInt(mainGlassIndex), w, h, q, options)
-	}, [glassType, mainGlassIndex, secondGlassIndex, width, height, quantity, urgent, calados, pasaVoz, puntasRedondeadas, camaraMm])
+	}, [glassType, mainGlassIndex, secondGlassIndex, width, height, quantity, urgent, bordePulido, calados, pasaVoz, puntasRedondeadas, camaraMm])
 
 	const isFormValid = !!currentCalculation && ((glassType === "dvh" || glassType === "laminado") ? secondGlassIndex !== "" : true)
 
