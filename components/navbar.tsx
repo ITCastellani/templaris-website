@@ -37,7 +37,7 @@ export function Navbar() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between lg:h-20">
           <a href="#inicio" className="flex items-center">
-            <TemplarisLogo className="h-10 w-auto lg:h-12" />
+            <TemplarisLogo className="h-[80px] w-auto lg:h-[120px]" />
           </a>
 
           <div className="hidden lg:flex lg:items-center lg:gap-8">
@@ -60,7 +60,7 @@ export function Navbar() {
 
           <button
             type="button"
-            className="lg:hidden text-[#374151]"
+            className="lg:hidden text-[#D0D0D0]"
             onClick={() => setIsOpen(!isOpen)}
             aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
           >
