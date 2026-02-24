@@ -6,12 +6,12 @@ import { Menu, X } from "lucide-react"
 import { TemplarisLogo } from "@/components/templaris-logo"
 
 const navLinks = [
-  { href: "#inicio", label: "Inicio" },
-  { href: "#nosotros", label: "Nosotros" },
-  { href: "#productos", label: "Productos" },
-  { href: "#servicios", label: "Servicios" },
-  { href: "#valores", label: "Valores" },
-  { href: "#contacto", label: "Contacto" },
+  { href: "/", label: "Inicio" },
+  { href: "/#nosotros", label: "Nosotros" },
+  { href: "/#productos", label: "Productos" },
+  { href: "/#servicios", label: "Servicios" },
+  { href: "/#valores", label: "Valores" },
+  { href: "/#contacto", label: "Contacto" },
 ]
 
 export function Navbar() {
@@ -36,7 +36,7 @@ export function Navbar() {
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between lg:h-20">
-          <a href="#inicio" className="flex items-center">
+          <a href="/" className="flex items-center">
             <TemplarisLogo className="h-[80px] w-auto lg:h-[120px]" />
           </a>
 

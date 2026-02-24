@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { ArrowLeft, Ruler, Layers, Hash, Calculator, CheckCircle2, SendHorizonal, Clock, ShieldCheck, Info, Trash2, Plus } from "lucide-react"
+import { ArrowLeft, Ruler, Layers, Hash, Calculator, CheckCircle2, SendHorizonal, Clock, ShieldCheck, Info, Trash2, Plus, User, Phone, Mail } from "lucide-react"
 import Link from "next/link"
-import { TemplarisLogo } from "@/components/templaris-logo" // Usamos tu nuevo componente corregido
+import { TemplarisLogo } from "@/components/templaris-logo"
 import {
   Select,
   SelectContent,
@@ -24,8 +24,12 @@ import {
   type GlassType,
   type CalculationOptions
 } from "@/lib/pricing"
+import { Navbar } from "./navbar"
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
-type Step = "form" | "thanks"
+// Añadimos el paso "checkout"
+type Step = "form" | "checkout" | "thanks"
 
 interface QuoteItem {
   id: string;
@@ -35,293 +39,535 @@ interface QuoteItem {
   quantity: number;
 }
 
+const getBase64ImageFromURL = (url: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.setAttribute("crossOrigin", "anonymous");
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      ctx?.drawImage(img, 0, 0);
+      const dataURL = canvas.toDataURL("image/png");
+      resolve(dataURL);
+    };
+    img.onerror = (error) => reject(error);
+    img.src = url;
+  });
+};
+
+
 export function QuoteForm() {
-	// --- ESTADOS DEL FORMULARIO ACTUAL ---
-	const [glassType, setGlassType] = useState<GlassType | "">("")
-	const [mainGlassIndex, setMainGlassIndex] = useState<string>("")
-	const [secondGlassIndex, setSecondGlassIndex] = useState<string>("")
-	const [width, setWidth] = useState("")
-	const [height, setHeight] = useState("")
-	const [quantity, setQuantity] = useState("1")
-	
-	// Opciones adicionales
-	const [urgent, setUrgent] = useState(false)
-	const [bordePulido, setBordePulido] = useState(false)
-	const [calados, setCalados] = useState("0")
-	const [pasaVoz, setPasaVoz] = useState(false)
-	const [puntasRedondeadas, setPuntasRedondeadas] = useState(false)
-	const [camaraMm, setCamaraMm] = useState<"6" | "9" | "12">("9")
+    // --- ESTADOS DEL FORMULARIO ACTUAL ---
+    const [glassType, setGlassType] = useState<GlassType | "">("")
+    const [mainGlassIndex, setMainGlassIndex] = useState<string>("")
+    const [secondGlassIndex, setSecondGlassIndex] = useState<string>("")
+    const [width, setWidth] = useState("")
+    const [height, setHeight] = useState("")
+    const [quantity, setQuantity] = useState("1")
+    
+    // Opciones adicionales
+    const [urgent, setUrgent] = useState(false)
+    const [bordePulido, setBordePulido] = useState(false)
+    const [calados, setCalados] = useState("0")
+    const [pasaVoz, setPasaVoz] = useState(false)
+    const [puntasRedondeadas, setPuntasRedondeadas] = useState(false)
+    const [camaraMm, setCamaraMm] = useState<"6" | "9" | "12">("9")
 
-	// --- ESTADO DE LA LISTA DE COTIZACIÓN (CARRITO) ---
-	const [items, setItems] = useState<QuoteItem[]>([])
-	const [step, setStep] = useState<Step>("form")
+    // --- ESTADO DE DATOS DEL CLIENTE ---
+    const [customerData, setCustomerData] = useState({
+        name: "",
+        phone: "",
+        email: ""
+    })
 
-	// --- LÓGICA DE FILTRADO ---
-	const availableGlasses = useMemo(() => {
-		if (!glassType) return []
-		return rawGlassData.map((g, index) => ({ ...g, index })).filter(g => {
-		if (glassType === "templado") return !!g["Precio Templado"]
-		if (glassType === "dvh") return !!g["Precio para DVH"]
-		if (glassType === "laminado") return !!g["Precio para Laminado"]
-		if (glassType === "espejos") return g["Nombre vidrio"].toUpperCase().includes("ESPEJO")
-		return !!g["precio para crudo"]
-		})
-	}, [glassType])
+    // --- ESTADO DE LA LISTA DE COTIZACIÓN (CARRITO) ---
+    const [items, setItems] = useState<QuoteItem[]>([])
+    const [step, setStep] = useState<Step>("form")
 
-	// Cálculo en tiempo real para la vista previa
-	const currentCalculation = useMemo(() => {
-		if (!glassType || mainGlassIndex === "" || !width || !height) return null
-		const w = parseFloat(width); const h = parseFloat(height); const q = parseInt(quantity)
-		if (isNaN(w) || isNaN(h) || q <= 0) return null
+	// --- GENERADOR DEL PDF ---
+	const generatePDF = async () => {
+		const doc = new jsPDF();
+		const pageWidth = doc.internal.pageSize.getWidth();
 
-		const options: CalculationOptions = {
-		urgent, bordePulido, calados: parseInt(calados) || 0, pasaVoz, puntasRedondeadas,
-		camaraMm: parseInt(camaraMm) as any,
-		vidrioSecundarioIndex: secondGlassIndex !== "" ? parseInt(secondGlassIndex) : undefined
+		// --- CONFIGURACIÓN DE COLORES ---
+		const primaryColor = [26, 28, 110]; // El azul de tu marca #1a1c6e
+		const accentColor = [234, 179, 8];  // El amarillo de la advertencia
+
+		// --- CABECERA ---
+		// Rectángulo estético superior
+
+		// Texto del Logo (Opcional si no tienes el base64 de la imagen, 
+		// pero aquí lo ponemos como texto estilizado de Templaris)
+
+		// --- CARGAR LOGO ---
+		try {
+			const logoData = await getBase64ImageFromURL("/images/logo.png");
+			// addImage(datos, formato, x, y, ancho, alto)
+			doc.addImage(logoData, "PNG", 140, 10, 60, 24); 
+		} catch (e) {
+			console.error("No se pudo cargar el logo", e);
+			// Fallback: Si no carga el logo, ponemos el texto
+			doc.setTextColor(255, 255, 255);
+			doc.setFontSize(20);
+			doc.setFont("helvetica", "bold");
+
+			doc.text("TEMPLARIS", 15, 25);
+			doc.setFontSize(10);
+			doc.setFont("helvetica", "normal");
+			doc.text("Soluciones Vidrieras de Alta Calidad", 15, 32);
 		}
 
-		return calculatePrice(glassType, parseInt(mainGlassIndex), w, h, q, options)
-	}, [glassType, mainGlassIndex, secondGlassIndex, width, height, quantity, urgent, bordePulido, calados, pasaVoz, puntasRedondeadas, camaraMm])
-
-	const isFormValid = !!currentCalculation && ((glassType === "dvh" || glassType === "laminado") ? secondGlassIndex !== "" : true)
-
-	// --- MANEJADORES ---
-	const addItem = () => {
-		if (!currentCalculation) return
-		const mainG = rawGlassData[parseInt(mainGlassIndex)]
 		
-		const newItem: QuoteItem = {
-		id: Math.random().toString(36).substr(2, 9),
-		description: mainG["Nombre vidrio"],
-		details: `${width}x${height}mm | ${glassType.toUpperCase()} ${urgent ? '(Urgente)' : ''}`,
-		price: currentCalculation.unitPrice,
-		quantity: parseInt(quantity)
+		
+
+		// --- INFORMACIÓN DEL CLIENTE ---
+		doc.setTextColor(40, 40, 40);
+		doc.setFontSize(12);
+		doc.setFont("helvetica", "bold");
+		doc.text("DATOS DEL CLIENTE:", 15, 55);
+		
+		doc.setFont("helvetica", "normal");
+		doc.setFontSize(10);
+		doc.text(`Nombre: ${customerData.name}`, 15, 62);
+		doc.text(`Teléfono: ${customerData.phone}`, 15, 68);
+		doc.text(`Email: ${customerData.email || "No provisto"}`, 15, 74);
+		doc.text(`Fecha: ${new Date().toLocaleDateString()}`, pageWidth - 15, 72, { align: "right" });
+
+		// --- TABLA DE PRODUCTOS ---
+		const tableRows = items.map(item => [
+			item.description,
+			item.details,
+			item.quantity.toString(),
+			formatARS(item.price),
+			formatARS(item.price * item.quantity)
+		]);
+
+		autoTable(doc, {
+			startY: 85,
+			head: [['Producto', 'Detalles', 'Cant.', 'Precio Unit.', 'Subtotal']],
+			body: tableRows,
+			theme: 'striped',
+			headStyles: {
+				fillColor: primaryColor,
+				textColor: [255, 255, 255],
+				fontSize: 10,
+				fontStyle: 'bold',
+				halign: 'center'
+			},
+			columnStyles: {
+				0: { cellWidth: 40 },
+				1: { cellWidth: 'auto' },
+				2: { halign: 'center' },
+				3: { halign: 'right' },
+				4: { halign: 'right', fontStyle: 'bold' }
+			},
+			styles: { fontSize: 9, cellPadding: 5 }
+		});
+
+		// --- TOTAL ---
+
+		// --- SECCIÓN DE TOTALES (SUBTOTAL, IVA, TOTAL) ---
+		const finalY = (doc as any).lastAutoTable.finalY + 10;
+		const subtotal = totalQuote;
+		const iva = subtotal * 0.21;
+		const totalConIva = subtotal + iva;
+
+		const marginX = pageWidth - 15;
+
+		doc.setFontSize(10);
+		doc.setTextColor(80, 80, 80);
+
+		// Subtotal
+		doc.text("Subtotal:", marginX - 50, finalY);
+		doc.text(formatARS(subtotal), marginX, finalY, { align: "right" });
+
+		// IVA
+		doc.text("IVA (21.00%):", marginX - 50, finalY + 7);
+		doc.text(formatARS(iva), marginX, finalY + 7, { align: "right" });
+
+		// Línea divisoria
+		doc.setDrawColor(200, 200, 200);
+		doc.line(marginX - 55, finalY + 10, marginX, finalY + 10);
+
+		// Total final
+		doc.setFontSize(14);
+		doc.setFont("helvetica", "bold");
+		doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+		doc.text("TOTAL:", marginX - 50, finalY + 18);
+		doc.text(formatARS(totalConIva), marginX, finalY + 18, { align: "right" });
+
+		// --- PIE DE PÁGINA ---
+		doc.setFontSize(8);
+		doc.setTextColor(150, 150, 150);
+		const footerText = "Este documento es una cotización orientativa sujeta a revisión técnica.";
+		doc.text(footerText, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: "center" });
+
+		// --- ABRIR EN NUEVA PESTAÑA ---
+		const pdfUrl = doc.output('bloburl');
+		window.open(pdfUrl, '_blank');
+	};
+
+    // --- LÓGICA DE FILTRADO ---
+    const availableGlasses = useMemo(() => {
+        if (!glassType) return []
+        return rawGlassData.map((g, index) => ({ ...g, index })).filter(g => {
+            if (glassType === "templado") return !!g["Precio Templado"]
+            if (glassType === "dvh") return !!g["Precio para DVH"]
+            if (glassType === "laminado") return !!g["Precio para Laminado"]
+            if (glassType === "espejos") return g["Nombre vidrio"].toUpperCase().includes("ESPEJO")
+            return !!g["precio para crudo"]
+        })
+    }, [glassType])
+
+    // Cálculo en tiempo real
+    const currentCalculation = useMemo(() => {
+        if (!glassType || mainGlassIndex === "" || !width || !height) return null
+        const w = parseFloat(width); const h = parseFloat(height); const q = parseInt(quantity)
+        if (isNaN(w) || isNaN(h) || q <= 0) return null
+
+        const options: CalculationOptions = {
+            urgent, bordePulido, calados: parseInt(calados) || 0, pasaVoz, puntasRedondeadas,
+            camaraMm: parseInt(camaraMm) as any,
+            vidrioSecundarioIndex: secondGlassIndex !== "" ? parseInt(secondGlassIndex) : undefined
+        }
+
+        return calculatePrice(glassType, parseInt(mainGlassIndex), w, h, q, options)
+    }, [glassType, mainGlassIndex, secondGlassIndex, width, height, quantity, urgent, bordePulido, calados, pasaVoz, puntasRedondeadas, camaraMm])
+
+    const isFormValid = !!currentCalculation && ((glassType === "dvh" || glassType === "laminado") ? secondGlassIndex !== "" : true)
+    
+    // Validación de datos de contacto
+    const isContactValid = customerData.name.trim().length > 2 && customerData.phone.trim().length > 6
+
+    // --- MANEJADORES ---
+    const addItem = () => {
+		if (!currentCalculation) return;
+		
+		const mainG = rawGlassData[parseInt(mainGlassIndex)];
+		let fullDescription = mainG["Nombre vidrio"];
+
+		// Si es DVH o Laminado, armamos el nombre compuesto
+		if ((glassType === "dvh" || glassType === "laminado") && secondGlassIndex !== "") {
+			const secondG = rawGlassData[parseInt(secondGlassIndex)];
+			const separator = glassType === "dvh" ? ` / Cam ${camaraMm}mm / ` : " + ";
+			fullDescription = `${mainG["Nombre vidrio"]}${separator}${secondG["Nombre vidrio"]}`;
 		}
-		setItems([...items, newItem])
-		// Limpiar campos para el siguiente vidrio (opcional, dejamos medidas para rapidez)
-		setQuantity("1")
-	}
 
-	const removeItem = (id: string) => setItems(items.filter(i => i.id !== id))
-	
-	const totalQuote = items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
+		const newItem: QuoteItem = {
+			id: Math.random().toString(36).substr(2, 9),
+			description: fullDescription, // <-- Aquí guardamos el nombre largo
+			details: `${width}x${height}mm | ${glassType.toUpperCase()} ${urgent ? '(Urgente)' : ''}`,
+			price: currentCalculation.unitPrice,
+			quantity: parseInt(quantity)
+		};
+		
+		setItems([...items, newItem]);
+		setQuantity("1");
+	};
 
-	const handleSendConsulta = () => setStep("thanks")
+    const removeItem = (id: string) => setItems(items.filter(i => i.id !== id))
+    const totalQuote = items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
 
-	return (
-		<div className="min-h-screen bg-secondary/30">
-			<header className="bg-accent border-b border-[#1a1c6e]">
-				<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-				<div className="flex h-16 items-center justify-between lg:h-20">
-					<Link href="/" className="flex items-center gap-2">
-					<TemplarisLogo className="w-40 h-auto" />
-					</Link>
-					<Link href="/" className="flex items-center gap-2 text-sm font-medium text-accent-foreground/70 hover:text-accent-foreground">
-					<ArrowLeft className="h-4 w-4" /> Inicio
-					</Link>
-				</div>
-				</div>
-			</header>
+    return (
+        <div className="min-h-screen bg-secondary/30">
+            <Navbar />
+            <div className="bg-white text-primary h-[90px]" />
 
-			<main className="mx-auto max-w-6xl px-4 py-10 lg:py-16">
-				{step === "form" ? (
-				<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-					
-					{/* COLUMNA IZQUIERDA: CONFIGURADOR */}
-					<div className="lg:col-span-7 space-y-6">
-					<div className="bg-card rounded-xl border p-6 shadow-sm space-y-6">
-						<div className="flex items-center gap-2 border-b pb-4">
-						<Plus className="text-primary h-5 w-5" />
-						<h2 className="font-bold font-mono text-lg">Configurar Vidrio</h2>
-						</div>
+            <div className="bg-yellow-600 text-white border-b border-yellow-700">
+                <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8 flex items-center justify-center gap-3">
+                    <Info className="h-5 w-5 text-yellow-100 shrink-0" />
+                    <p className="text-sm font-medium text-center leading-tight">
+                        Aviso: Los precios son orientativos y pueden variar según la complejidad técnica del trabajo.
+                    </p>
+                </div>
+            </div>
 
-						<div className="grid gap-6">
-						{/* Tipo y Vidrio Principal */}
-						<div className="grid sm:grid-cols-2 gap-4">
-							<div className="space-y-2">
-							<Label className="text-xs font-bold uppercase text-muted-foreground">Tipo</Label>
-							<Select value={glassType} onValueChange={(val) => { setGlassType(val as GlassType); setMainGlassIndex(""); setSecondGlassIndex(""); }}>
-								<SelectTrigger className="bg-background"><SelectValue placeholder="Selecciona..." /></SelectTrigger>
-								<SelectContent>
-								<SelectItem value="crudo">Crudo</SelectItem>
-								<SelectItem value="templado">Templado</SelectItem>
-								<SelectItem value="dvh">DVH</SelectItem>
-								<SelectItem value="laminado">Laminado</SelectItem>
-								<SelectItem value="espejos">Espejo</SelectItem>
-								</SelectContent>
-							</Select>
-							</div>
-							<div className="space-y-2">
-							<Label className="text-xs font-bold uppercase text-muted-foreground">Vidrio Principal</Label>
-							<Select value={mainGlassIndex} onValueChange={setMainGlassIndex} disabled={!glassType}>
-								<SelectTrigger><SelectValue placeholder="Espesor/Color" /></SelectTrigger>
-								<SelectContent>
-								{availableGlasses.map((g) => (
-									<SelectItem key={g.index} value={g.index.toString()}>{g["Nombre vidrio"]}</SelectItem>
-								))}
-								</SelectContent>
-							</Select>
-							</div>
+            <main className="mx-auto max-w-6xl px-4 py-10 lg:py-16">
+                
+                {/* STEP 1: FORMULARIO DE COTIZACIÓN */}
+                {step === "form" && (
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <div className="lg:col-span-7 space-y-6">
+                        <div className="bg-card rounded-xl border p-6 shadow-sm space-y-6">
+                            <div className="flex items-center gap-2 border-b pb-4">
+                                <Plus className="text-primary h-5 w-5" />
+                                <h2 className="font-bold font-mono text-lg">Configurar Vidrio</h2>
+                            </div>
 
-							{/* Vidrio Secundario / Cámara */}
-							{(glassType === "dvh" || glassType === "laminado") && (
-								<div className="grid sm:grid-cols-2 gap-4 animate-in fade-in duration-300">
-								<div className="space-y-2">
-									<Label className="text-xs font-bold uppercase text-muted-foreground">Vidrio Secundario</Label>
-									<Select value={secondGlassIndex} onValueChange={setSecondGlassIndex}>
-									<SelectTrigger><SelectValue placeholder="Seleccionar..." /></SelectTrigger>
-									<SelectContent>
-										{availableGlasses.map((g) => (
-										<SelectItem key={g.index} value={g.index.toString()}>{g["Nombre vidrio"]}</SelectItem>
-										))}
-									</SelectContent>
-									</Select>
-								</div>
-								{glassType === "dvh" && (
-									<div className="space-y-2">
-									<Label className="text-xs font-bold uppercase text-muted-foreground">Cámara</Label>
-									<Select value={camaraMm} onValueChange={(v: any) => setCamaraMm(v)}>
-										<SelectTrigger><SelectValue /></SelectTrigger>
-										<SelectContent>
-										<SelectItem value="6">6mm</SelectItem>
-										<SelectItem value="9">9mm</SelectItem>
-										<SelectItem value="12">12mm</SelectItem>
-										</SelectContent>
-									</Select>
-									</div>
-								)}
-								</div>
-							)}
-						</div>
+                            <div className="grid gap-6">
+                                <div className="grid sm:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-bold uppercase text-muted-foreground">Tipo</Label>
+                                        <Select value={glassType} onValueChange={(val) => { setGlassType(val as GlassType); setMainGlassIndex(""); setSecondGlassIndex(""); }}>
+                                            <SelectTrigger className="bg-background"><SelectValue placeholder="Selecciona..." /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="crudo">Crudo</SelectItem>
+                                                <SelectItem value="templado">Templado</SelectItem>
+                                                <SelectItem value="dvh">DVH</SelectItem>
+                                                <SelectItem value="laminado">Laminado</SelectItem>
+                                                <SelectItem value="espejos">Espejo</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-bold uppercase text-muted-foreground">Vidrio Principal</Label>
+                                        <Select value={mainGlassIndex} onValueChange={setMainGlassIndex} disabled={!glassType}>
+                                            <SelectTrigger><SelectValue placeholder="Espesor/Color" /></SelectTrigger>
+                                            <SelectContent>
+                                                {availableGlasses.map((g) => (
+                                                    <SelectItem key={g.index} value={g.index.toString()}>{g["Nombre vidrio"]}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
 
-						{/* Medidas */}
-						<div className="grid grid-cols-3 gap-4">
-							<div className="space-y-2">
-							<Label className="text-xs font-bold uppercase text-muted-foreground">Ancho (mm)</Label>
-							<Input type="number" value={width} onChange={(e) => setWidth(e.target.value)} />
-							</div>
-							<div className="space-y-2">
-							<Label className="text-xs font-bold uppercase text-muted-foreground">Alto (mm)</Label>
-							<Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} />
-							</div>
-							<div className="space-y-2">
-							<Label className="text-xs font-bold uppercase text-muted-foreground">Cant.</Label>
-							<Input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
-							</div>
-						</div>
+                                {(glassType === "dvh" || glassType === "laminado") && (
+                                    <div className="grid sm:grid-cols-2 gap-4 animate-in fade-in duration-300">
+                                        <div className="space-y-2">
+                                            <Label className="text-xs font-bold uppercase text-muted-foreground">Vidrio Secundario</Label>
+                                            <Select value={secondGlassIndex} onValueChange={setSecondGlassIndex}>
+                                                <SelectTrigger><SelectValue placeholder="Seleccionar..." /></SelectTrigger>
+                                                <SelectContent>
+                                                    {availableGlasses.map((g) => (
+                                                        <SelectItem key={g.index} value={g.index.toString()}>{g["Nombre vidrio"]}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        {glassType === "dvh" && (
+                                            <div className="space-y-2">
+                                                <Label className="text-xs font-bold uppercase text-muted-foreground">Cámara</Label>
+                                                <Select value={camaraMm} onValueChange={(v: any) => setCamaraMm(v)}>
+                                                    <SelectTrigger><SelectValue /></SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="6">6mm</SelectItem>
+                                                        <SelectItem value="9">9mm</SelectItem>
+                                                        <SelectItem value="12">12mm</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
 
-						
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-bold uppercase text-muted-foreground">Ancho (mm)</Label>
+                                        <Input type="number" value={width} onChange={(e) => setWidth(e.target.value)} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-bold uppercase text-muted-foreground">Alto (mm)</Label>
+                                        <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-bold uppercase text-muted-foreground">Cant.</Label>
+                                        <Input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+                                    </div>
+                                </div>
 
-						{/* Adicionales */}
-						<div className="p-4 bg-secondary/40 rounded-lg grid sm:grid-cols-2 gap-4">
-							<div className="space-y-3">
-							<div className="flex items-center gap-2">
-								<Checkbox id="urgent" checked={urgent} onCheckedChange={(v) => setUrgent(!!v)} />
-								<label htmlFor="urgent" className="text-sm font-medium leading-none cursor-pointer">Entrega Urgente (+50%)</label>
-								<Checkbox id="bordePulido" checked={bordePulido} onCheckedChange={(v) => setBordePulido(!!v)} />
-								<label htmlFor="bordePulido" className="text-sm font-medium leading-none cursor-pointer">Borde Pulido</label>
-							</div>
-							{glassType === "templado" && (
-								<>
-								<div className="flex items-center gap-2">
-									<Checkbox id="pasavoz" checked={pasaVoz} onCheckedChange={(v) => setPasaVoz(!!v)} />
-									<label htmlFor="pasavoz" className="text-sm cursor-pointer">Pasa voz</label>
-								</div>
-								<div className="flex items-center gap-2">
-									<Checkbox id="puntas" checked={puntasRedondeadas} onCheckedChange={(v) => setPuntasRedondeadas(!!v)} />
-									<label htmlFor="puntas" className="text-sm cursor-pointer">Puntas redondeadas</label>
-								</div>
-								</>
-							)}
-							</div>
-							{glassType === "templado" && (
-							<div className="flex flex-col gap-2">
-								<Label className="text-xs">Cant. de Calados</Label>
-								<Input type="number" className="h-8 w-20" value={calados} onChange={(e) => setCalados(e.target.value)} />
-							</div>
-							)}
-						</div>
-						</div>
+                                <div className="p-4 bg-secondary/40 rounded-lg grid sm:grid-cols-2 gap-4">
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2">
+                                            <Checkbox id="urgent" checked={urgent} onCheckedChange={(v) => setUrgent(!!v)} />
+                                            <label htmlFor="urgent" className="text-sm font-medium leading-none cursor-pointer">Entrega Urgente (+50%)</label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Checkbox id="bordePulido" checked={bordePulido} onCheckedChange={(v) => setBordePulido(!!v)} />
+                                            <label htmlFor="bordePulido" className="text-sm font-medium leading-none cursor-pointer">Borde Pulido</label>
+                                        </div>
+                                    </div>
+                                    {glassType === "templado" && (
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-2">
+                                                <Checkbox id="pasavoz" checked={pasaVoz} onCheckedChange={(v) => setPasaVoz(!!v)} />
+                                                <label htmlFor="pasavoz" className="text-sm cursor-pointer">Pasa voz</label>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Checkbox id="puntas" checked={puntasRedondeadas} onCheckedChange={(v) => setPuntasRedondeadas(!!v)} />
+                                                <label htmlFor="puntas" className="text-sm cursor-pointer">Puntas redondeadas</label>
+                                            </div>
+											{/* INPUT DE CALADOS AGREGADO AQUÍ */}
+											<div className="flex flex-col gap-2">
+												<Label htmlFor="calados" className="text-xs font-bold uppercase text-muted-foreground">Cant. de Calados</Label>
+												<Input 
+													id="calados"
+													type="number" 
+													min="0"
+													className="h-9 w-24 bg-background" 
+													value={calados} 
+													onChange={(e) => setCalados(e.target.value)} 
+												/>
+											</div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
-						<Button size="lg" className="w-full font-bold" disabled={!isFormValid} onClick={addItem}>
-						<Plus className="h-5 w-5 mr-2" /> Agregar a la lista
-						</Button>
-					</div>
-					</div>
+                            <Button size="lg" className="w-full font-bold" disabled={!isFormValid} onClick={addItem}>
+                                <Plus className="h-5 w-5 mr-2" /> Agregar a la lista
+                            </Button>
+                        </div>
+                    </div>
 
-					{/* COLUMNA DERECHA: LISTA DE PRODUCTOS */}
-					<div className="lg:col-span-5 space-y-6">
-					<div className="bg-card rounded-xl border shadow-md flex flex-col h-full overflow-hidden">
-						<div className="bg-primary p-4 text-primary-foreground flex justify-between items-center">
-						<h3 className="font-bold font-mono">Resumen del Presupuesto</h3>
-						<Badge variant="outline" className="text-white border-white">{items.length} items</Badge>
-						</div>
-						
-						<div className="flex-1 p-4 max-h-[400px] overflow-y-auto">
-						{items.length === 0 ? (
-							<div className="h-40 flex flex-col items-center justify-center text-muted-foreground gap-2">
-							<Calculator className="h-8 w-8 opacity-20" />
-							<p className="text-sm">Aún no hay vidrios agregados</p>
-							</div>
-						) : (
-							<div className="space-y-4">
-							{items.map((item) => (
-								<div key={item.id} className="flex justify-between items-start border-b pb-3 group">
-								<div className="space-y-1">
-									<p className="font-bold text-sm leading-none">{item.description}</p>
-									<p className="text-[11px] text-muted-foreground">{item.details}</p>
-									<p className="text-xs font-semibold">{item.quantity} un. x {formatARS(item.price)}</p>
-								</div>
-								<div className="flex items-center gap-3">
-									<span className="font-mono font-bold text-sm">{formatARS(item.price * item.quantity)}</span>
-									<button onClick={() => removeItem(item.id)} className="text-muted-foreground hover:text-destructive transition-colors">
-									<Trash2 className="h-4 w-4" />
-									</button>
-								</div>
-								</div>
-							))}
-							</div>
-						)}
-						</div>
+                    <div className="lg:col-span-5 space-y-6">
+                        <div className="bg-card rounded-xl border shadow-md flex flex-col h-full overflow-hidden">
+                            <div className="bg-primary p-4 text-primary-foreground flex justify-between items-center">
+                                <h3 className="font-bold font-mono text-lg">Tu Presupuesto</h3>
+                                <Badge variant="outline" className="text-white border-white">{items.length} items</Badge>
+                            </div>
+                            
+                            <div className="flex-1 p-4 max-h-[400px] overflow-y-auto">
+                                {items.length === 0 ? (
+                                    <div className="h-40 flex flex-col items-center justify-center text-muted-foreground gap-2 text-center">
+                                        <Calculator className="h-8 w-8 opacity-20" />
+                                        <p className="text-sm">Configura un vidrio y agrégalo para ver el total</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {items.map((item) => (
+                                            <div key={item.id} className="flex justify-between items-start border-b pb-3 group">
+                                                <div className="space-y-1">
+                                                    <p className="font-bold text-sm leading-none">{item.description}</p>
+                                                    <p className="text-[11px] text-muted-foreground">{item.details}</p>
+                                                    <p className="text-xs font-semibold">{item.quantity} un. x {formatARS(item.price)}</p>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="font-mono font-bold text-sm">{formatARS(item.price * item.quantity)}</span>
+                                                    <button onClick={() => removeItem(item.id)} className="text-muted-foreground hover:text-destructive transition-colors">
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
 
-						<div className="p-5 bg-secondary/50 border-t">
-						<div className="flex justify-between items-end mb-6">
-							<div>
-							<p className="text-[10px] font-bold uppercase text-muted-foreground">Total Estimado</p>
-							<p className="text-xs text-muted-foreground">Precios sin IVA</p>
-							</div>
-							<p className="text-3xl font-bold font-mono text-primary">{formatARS(totalQuote)}</p>
-						</div>
-						<Button className="w-full h-12 text-base font-bold" disabled={items.length === 0} onClick={handleSendConsulta}>
-							<SendHorizonal className="h-5 w-5 mr-2" /> Enviar Consulta Final
-						</Button>
-						</div>
-					</div>
+                            <div className="p-5 bg-secondary/50 border-t">
+                                <div className="flex justify-between items-end mb-6">
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase text-muted-foreground">Total Estimado</p>
+                                        <p className="text-xs text-muted-foreground">Precios sin IVA</p>
+                                    </div>
+                                    <p className="text-3xl font-bold font-mono text-primary">{formatARS(totalQuote)}</p>
+                                </div>
+                                <Button 
+                                    className="w-full h-12 text-base font-bold" 
+                                    disabled={items.length === 0} 
+                                    onClick={() => setStep("checkout")}
+                                >
+                                    <SendHorizonal className="h-5 w-5 mr-2" /> Enviar Consulta Final
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                )}
 
-					<div className="bg-blue-50 border border-blue-100 p-4 rounded-lg flex gap-3">
-						<Info className="h-5 w-5 text-blue-500 shrink-0" />
-						<p className="text-xs text-blue-700 leading-relaxed">
-						Los precios son orientativos y pueden variar según la complejidad técnica del trabajo.
-						</p>
-					</div>
-					</div>
+                {/* STEP 2: FORMULARIO DE CONTACTO (CHECKOUT) */}
+                {step === "checkout" && (
+                    <div className="max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="bg-card rounded-xl border shadow-lg overflow-hidden">
+                            <div className="bg-primary p-6 text-primary-foreground text-center">
+                                <h2 className="text-2xl font-bold font-mono mb-2">Un último paso...</h2>
+                                <p className="text-primary-foreground/80 text-sm">Necesitamos tus datos para enviarte el presupuesto formal.</p>
+                            </div>
+                            
+                            <div className="p-8 space-y-6">
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label className="flex items-center gap-2"><User className="h-4 w-4 text-primary" /> Nombre y Apellido *</Label>
+                                        <Input 
+                                            placeholder="Ej: Juan Pérez" 
+                                            className="h-12"
+                                            value={customerData.name}
+                                            onChange={(e) => setCustomerData({...customerData, name: e.target.value})}
+                                        />
+                                    </div>
+                                    
+                                    <div className="space-y-2">
+                                        <Label className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary" /> WhatsApp / Teléfono *</Label>
+                                        <Input 
+                                            placeholder="Ej: 11 2233 4455" 
+                                            className="h-12"
+                                            value={customerData.phone}
+                                            onChange={(e) => setCustomerData({...customerData, phone: e.target.value})}
+                                        />
+                                    </div>
 
-				</div>
-				) : (
-				<div className="max-w-md mx-auto rounded-xl border border-border bg-card p-8 sm:p-12 shadow-sm text-center">
-					<div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 mb-6">
-					<ShieldCheck className="h-8 w-8 text-primary" />
-					</div>
-					<h2 className="text-2xl font-bold text-foreground font-mono mb-3">Solicitud Enviada</h2>
-					<p className="text-muted-foreground mb-8">Hemos recibido tu lista de {items.length} vidrios. Un asesor te contactará en breve.</p>
-					<Button size="lg" className="w-full" onClick={() => { setStep("form"); setItems([]); }}>Nueva Cotización</Button>
-				</div>
-				)}
-			</main>
+                                    <div className="space-y-2">
+                                        <Label className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary" /> Email (Opcional)</Label>
+                                        <Input 
+                                            type="email" 
+                                            placeholder="juan@ejemplo.com" 
+                                            className="h-12"
+                                            value={customerData.email}
+                                            onChange={(e) => setCustomerData({...customerData, email: e.target.value})}
+                                        />
+                                    </div>
+                                </div>
 
-			<footer className="border-t border-border bg-card py-8 mt-auto text-center text-sm text-muted-foreground">
-				<p>Templaris © 2024 | Soluciones Vidrieras de Alta Calidad</p>
-			</footer>
-		</div>
-	)
+                                <div className="bg-secondary/50 p-4 rounded-lg border flex justify-between items-center">
+                                    <span className="text-sm font-medium">Total de la consulta:</span>
+                                    <span className="text-xl font-bold font-mono text-primary">{formatARS(totalQuote)}</span>
+                                </div>
+
+                                <div className="flex flex-col gap-3">
+        
+									<Button 
+										size="lg" 
+										className="h-14 text-lg font-bold w-full" 
+										disabled={!isContactValid}
+										onClick={() => {
+											generatePDF(); // Genera el PDF
+											setStep("thanks"); // Pasa a la pantalla de gracias
+										}}
+									>
+										Confirmar y Enviar
+									</Button>
+                                    <Button 
+                                        variant="ghost" 
+                                        onClick={() => setStep("form")}
+                                    >
+                                        Volver a la lista
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* STEP 3: GRACIAS */}
+                {step === "thanks" && (
+                <div className="max-w-md mx-auto rounded-xl border border-border bg-card p-8 sm:p-12 shadow-sm text-center animate-in zoom-in duration-300">
+                    <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-6">
+                        <ShieldCheck className="h-10 w-10 text-green-600" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-foreground font-mono mb-3">¡Solicitud Enviada!</h2>
+                    <p className="text-muted-foreground mb-8">
+                        Gracias <strong>{customerData.name}</strong>. Hemos recibido tu pedido por un total de {formatARS(totalQuote)}. Un asesor te contactará al {customerData.phone} en menos de 24hs hábiles.
+                    </p>
+                    <Button 
+                        size="lg" 
+                        className="w-full h-12" 
+                        onClick={() => { 
+                            setStep("form"); 
+                            setItems([]); 
+                            setCustomerData({name: "", phone: "", email: ""});
+                        }}
+                    >
+                        Nueva Cotización
+                    </Button>
+                </div>
+                )}
+            </main>
+
+            <footer className="border-t border-border bg-card py-8 mt-auto text-center text-sm text-muted-foreground">
+                <p>Templaris © 2024 | Soluciones Vidrieras de Alta Calidad</p>
+            </footer>
+        </div>
+    )
 }
