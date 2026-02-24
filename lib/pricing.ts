@@ -300,7 +300,7 @@ export function calculatePrice(
 
   // REGLA: El templado SIEMPRE lleva borde pulido por proceso. 
   // Para los demás, depende de lo que elija el usuario.
-  const needsPolish = type === "templado" ? true : !!options.bordePulido;
+  const needsPolish = !!options.bordePulido;
 
   switch (type) {
     case "crudo":
@@ -310,7 +310,7 @@ export function calculatePrice(
 
     case "templado":
       // El templado siempre usa 'true' en pulido
-      unitPrice = calculateBasePiece(mainGlass["Precio Templado"] || 0, widthMm, heightMm, mainGlass.espesor, true);
+      unitPrice = calculateBasePiece(mainGlass["Precio Templado"] || 0, widthMm, heightMm, mainGlass.espesor, needsPolish);
       if (options.calados) unitPrice += options.calados * 1500;
       if (options.pasaVoz) unitPrice += 8320;
       if (options.puntasRedondeadas) unitPrice += 5200;
