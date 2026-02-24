@@ -88,6 +88,11 @@ export const rawGlassData = [
     "espesor": 6
   },
   {
+    "Nombre vidrio": "CATEDRAL STIPOLITE - SYCAMORE",
+    "precio para crudo": 14499.58,
+    "espesor": 6
+  },
+  {
     "Nombre vidrio": "ESPEJO 3mm",
     "precio para crudo": 19779.123,
     "espesor": 3
@@ -236,10 +241,12 @@ export const rawGlassData = [
   // ... (puedes seguir pegando el resto del JSON agregando el espesor numérico)
 ];
 
+
 export type GlassType = "templado" | "laminado" | "crudo" | "dvh" | "espejos";
 
 export interface CalculationOptions {
   urgent: boolean;
+  bordePulido?: boolean; // <-- Nueva opción
   calados?: number;
   pasaVoz?: boolean;
   puntasRedondeadas?: boolean;
@@ -248,9 +255,16 @@ export interface CalculationOptions {
 }
 
 /**
- * LÓGICA DE CÁLCULO MANTENIENDO PROPIEDADES ORIGINALES
+ * LÓGICA DE CÁLCULO MEJORADA
+ * Se añade el parámetro 'shouldPolish'
  */
-function calculateBasePiece(pricePerM2: number, widthMm: number, heightMm: number, thickness: number): number {
+function calculateBasePiece(
+  pricePerM2: number, 
+  widthMm: number, 
+  heightMm: number, 
+  thickness: number, 
+  shouldPolish: boolean // <-- Nuevo parámetro
+): number {
   const widthM = widthMm / 1000;
   const heightM = heightMm / 1000;
   let area = widthM * heightM;
@@ -260,12 +274,14 @@ function calculateBasePiece(pricePerM2: number, widthMm: number, heightMm: numbe
   const areaForPrice = area < 0.5 ? 0.5 : area;
   let price = areaForPrice * pricePerM2;
 
-  // 2. Recargo por grandes dimensiones (> 4.5 m2)
-  if (area > 4.5) price *= 1.2;
+  // 2. Recargo por grandes dimensiones (> 4.6 m2)
+  if (area > 4.6) price *= 1.2;
 
-  // 3. Borde pulido (espesor >= 12mm ? 3000 : 1450)
-  const costPerLinealMeter = thickness >= 12 ? 3000 : 1450;
-  price += perimeter * costPerLinealMeter;
+  // 3. Borde pulido: SOLO se suma si shouldPolish es true
+  if (shouldPolish) {
+    const costPerLinealMeter = thickness >= 12 ? 3000 : 1450;
+    price += perimeter * costPerLinealMeter;
+  }
 
   return price;
 }
@@ -282,34 +298,38 @@ export function calculatePrice(
   const areaReal = (widthMm / 1000) * (heightMm / 1000);
   let unitPrice = 0;
 
+  // REGLA: El templado SIEMPRE lleva borde pulido por proceso. 
+  // Para los demás, depende de lo que elija el usuario.
+  const needsPolish = type === "templado" ? true : !!options.bordePulido;
+
   switch (type) {
     case "crudo":
     case "espejos":
-      unitPrice = calculateBasePiece(mainGlass["precio para crudo"] || 0, widthMm, heightMm, mainGlass.espesor);
+      unitPrice = calculateBasePiece(mainGlass["precio para crudo"] || 0, widthMm, heightMm, mainGlass.espesor, needsPolish);
       break;
 
     case "templado":
-      unitPrice = calculateBasePiece(mainGlass["Precio Templado"] || 0, widthMm, heightMm, mainGlass.espesor);
+      // El templado siempre usa 'true' en pulido
+      unitPrice = calculateBasePiece(mainGlass["Precio Templado"] || 0, widthMm, heightMm, mainGlass.espesor, true);
       if (options.calados) unitPrice += options.calados * 1500;
       if (options.pasaVoz) unitPrice += 8320;
       if (options.puntasRedondeadas) unitPrice += 5200;
       break;
 
     case "laminado":
-      // Lógica de Laminado: Vidrio 1 + Vidrio 2 + PVB (79750 x m2)
-      const v1Price = calculateBasePiece(mainGlass["Precio para Laminado"] || 0, widthMm, heightMm, mainGlass.espesor);
+      const v1Price = calculateBasePiece(mainGlass["Precio para Laminado"] || 0, widthMm, heightMm, mainGlass.espesor, needsPolish);
       const secondGlass = (rawGlassData[options.vidrioSecundarioIndex ?? glassIndex] as any);
-      const v2Price = calculateBasePiece(secondGlass["Precio para Laminado"] || 0, widthMm, heightMm, secondGlass.espesor);
+      const v2Price = calculateBasePiece(secondGlass["Precio para Laminado"] || 0, widthMm, heightMm, secondGlass.espesor, needsPolish);
 
       const areaMinPVB = areaReal < 0.5 ? 0.5 : areaReal;
       unitPrice = v1Price + v2Price + (areaMinPVB * 79750);
       break;
 
     case "dvh":
-      // Lógica de DVH: Vidrio Int + Vidrio Ext + Perímetro de Cámara
-      const vi = calculateBasePiece(mainGlass["Precio para DVH"] || 0, widthMm, heightMm, mainGlass.espesor);
+      // En DVH el pulido suele ser opcional/estético ya que los bordes van dentro del perfil
+      const vi = calculateBasePiece(mainGlass["Precio para DVH"] || 0, widthMm, heightMm, mainGlass.espesor, needsPolish);
       const extG = (rawGlassData[options.vidrioSecundarioIndex ?? glassIndex] as any);
-      const ve = calculateBasePiece(extG["Precio para DVH"] || 0, widthMm, heightMm, extG.espesor);
+      const ve = calculateBasePiece(extG["Precio para DVH"] || 0, widthMm, heightMm, extG.espesor, needsPolish);
 
       const perimetroM = ((widthMm + heightMm) * 2) / 1000;
       const costCamara = options.camaraMm === 12 ? 2500 : options.camaraMm === 9 ? 2000 : 1500;
