@@ -304,6 +304,7 @@ export function QuoteForm() {
                                             <SelectTrigger className="bg-background"><SelectValue placeholder="Selecciona..." /></SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="crudo">Crudo</SelectItem>
+												<SelectItem value="planchas">Por Plancha</SelectItem>
                                                 <SelectItem value="templado">Templado</SelectItem>
                                                 <SelectItem value="dvh">DVH</SelectItem>
                                                 <SelectItem value="laminado">Laminado</SelectItem>

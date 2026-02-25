@@ -242,7 +242,7 @@ export const rawGlassData = [
 ];
 
 
-export type GlassType = "templado" | "laminado" | "crudo" | "dvh" | "espejos";
+export type GlassType = "templado" | "laminado" | "crudo" | "dvh" | "espejos" | "planchas";
 
 export interface CalculationOptions {
   urgent: boolean;
@@ -263,7 +263,8 @@ function calculateBasePiece(
   widthMm: number, 
   heightMm: number, 
   thickness: number, 
-  shouldPolish: boolean // <-- Nuevo parámetro
+  shouldPolish: boolean, // <-- Nuevo parámetro
+  type?: string
 ): number {
   const widthM = widthMm / 1000;
   const heightM = heightMm / 1000;
@@ -275,7 +276,8 @@ function calculateBasePiece(
   let price = areaForPrice * pricePerM2;
 
   // 2. Recargo por grandes dimensiones (> 4.6 m2)
-  if (area > 4.6) price *= 1.2;
+
+  if (area > 4.5 && type !== 'planchas') price *= 1.2;
 
   // 3. Borde pulido: SOLO se suma si shouldPolish es true
   if (shouldPolish) {
@@ -305,7 +307,8 @@ export function calculatePrice(
   switch (type) {
     case "crudo":
     case "espejos":
-      unitPrice = calculateBasePiece(mainGlass["precio para crudo"] || 0, widthMm, heightMm, mainGlass.espesor, needsPolish);
+    case "planchas":
+      unitPrice = calculateBasePiece(mainGlass["precio para crudo"] || 0, widthMm, heightMm, mainGlass.espesor, needsPolish, type);
       break;
 
     case "templado":
