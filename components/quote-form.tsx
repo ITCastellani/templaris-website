@@ -66,6 +66,11 @@ export function QuoteForm() {
     const [width, setWidth] = useState("")
     const [height, setHeight] = useState("")
     const [quantity, setQuantity] = useState("1")
+
+    // --- ESTADOS PARA ITEM MANUAL ---
+    const [manualDescription, setManualDescription] = useState("")
+    const [manualPrice, setManualPrice] = useState("")
+    const [showManual, setShowManual] = useState(false) // Para mostrar/ocultar los campos
     
     // Opciones adicionales
     const [urgent, setUrgent] = useState(false)
@@ -267,6 +272,26 @@ export function QuoteForm() {
 		setQuantity("1");
 	};
 
+    //-- Función para agregar el item manual --
+    const addManualItem = () => {
+        const price = parseFloat(manualPrice);
+        if (!manualDescription || isNaN(price)) return;
+
+        const newItem: QuoteItem = {
+            id: Math.random().toString(36).substr(2, 9),
+            description: manualDescription,
+            details: "Accesorio / Servicio extra",
+            price: price,
+            quantity: 1
+        };
+
+        setItems([...items, newItem]);
+        // Limpiamos campos y cerramos
+        setManualDescription("");
+        setManualPrice("");
+        setShowManual(false);
+    };
+
     const removeItem = (id: string) => setItems(items.filter(i => i.id !== id))
     const totalQuote = items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
 
@@ -404,7 +429,57 @@ export function QuoteForm() {
 											</div>
                                         </div>
                                     )}
+
+                                    
                                 </div>
+                                {/* SECCIÓN DE ITEM MANUAL */}
+                                    <div className="pt-4 border-t flex justify-start">
+                                        {!showManual ? (
+                                            <Button 
+                                                variant="outline" 
+                                                className="h-10 px-6 border-dashed border-muted-foreground/40 hover:border-primary hover:bg-primary/50 transition-all text-xs font-bold"
+                                                onClick={() => setShowManual(true)}
+                                            >
+                                                <Plus className="h-4 w-4 mr-2" /> Agregar Item Manual (Corte con Formas, Envío, etc.)
+                                            </Button>
+                                        ) : (
+                                            <div className="space-y-4 p-4 bg-muted/50 rounded-lg animate-in fade-in zoom-in-95 duration-200">
+                                                <div className="flex justify-between items-center">
+                                                    <h4 className="text-xs font-bold uppercase text-primary">Nuevo Item Extra</h4>
+                                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setShowManual(false)}>
+                                                        <Trash2 className="h-3 w-3" />
+                                                    </Button>
+                                                </div>
+                                                <div className="grid gap-3">
+                                                    <div className="space-y-1">
+                                                        <Label className="text-[10px] uppercase">Descripción</Label>
+                                                        <Input 
+                                                            placeholder="Ej: Kit de herrajes para puerta" 
+                                                            value={manualDescription}
+                                                            onChange={(e) => setManualDescription(e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <Label className="text-[10px] uppercase">Precio Unitario ($)</Label>
+                                                        <Input 
+                                                            type="number" 
+                                                            placeholder="0.00" 
+                                                            value={manualPrice}
+                                                            onChange={(e) => setManualPrice(e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <Button 
+                                                        size="sm" 
+                                                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                                                        onClick={addManualItem}
+                                                        disabled={!manualDescription || !manualPrice}
+                                                    >
+                                                        Confirmar Item
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                             </div>
 
                             <Button size="lg" className="w-full font-bold" disabled={!isFormValid} onClick={addItem}>
