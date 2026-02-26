@@ -103,6 +103,13 @@ export const rawGlassData = [
     "espesor": 4
   },
   {
+    "Nombre vidrio": "CATEDRAL PACIFICO 4mm",
+    "precio para crudo": 15224.00,
+    "Precio para DVH": 27100.00,
+    "Precio para Laminado": 27100.00,
+    "espesor": 4
+  },
+  {
     "Nombre vidrio": "CATEDRAL Opacid 4mm",
     "precio para crudo": 46574.892,
     "Precio para DVH": 68000.00,
