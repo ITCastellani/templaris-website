@@ -80,6 +80,9 @@ export function QuoteForm() {
     const [puntasRedondeadas, setPuntasRedondeadas] = useState(false)
     const [camaraMm, setCamaraMm] = useState<"6" | "9" | "12">("9")
 
+    // Descuentos
+    const [discount, setDiscount] = useState("0") // Estado para el porcentaje de descuento
+
     // --- ESTADO DE DATOS DEL CLIENTE ---
     const [customerData, setCustomerData] = useState({
         name: "",
@@ -175,6 +178,8 @@ export function QuoteForm() {
 
 		// --- SECCIÓN DE TOTALES (SUBTOTAL, IVA, TOTAL) ---
 		const finalY = (doc as any).lastAutoTable.finalY + 10;
+        const discount = discountAmount
+        const totalBrute = subtotalQuote
 		const subtotal = totalQuote;
 		const iva = subtotal * 0.21;
 		const totalConIva = subtotal + iva;
@@ -186,22 +191,29 @@ export function QuoteForm() {
 
 		// Subtotal
 		doc.text("Subtotal:", marginX - 50, finalY);
-		doc.text(formatARS(subtotal), marginX, finalY, { align: "right" });
+		doc.text(formatARS(totalBrute), marginX, finalY, { align: "right" });
+
+        let plusPosition = 0
+        if(discountAmount){
+            plusPosition = 7
+            doc.text("Descuento:", marginX - 50, finalY + plusPosition);
+		    doc.text(`- ${formatARS(discountAmount)}`, marginX, finalY + plusPosition, { align: "right" });
+        }
 
 		// IVA
-		doc.text("IVA (21.00%):", marginX - 50, finalY + 7);
-		doc.text(formatARS(iva), marginX, finalY + 7, { align: "right" });
+		doc.text("IVA (21.00%):", marginX - 50, finalY + plusPosition + 7);
+		doc.text(formatARS(iva), marginX, finalY + plusPosition + 7, { align: "right" });
 
 		// Línea divisoria
 		doc.setDrawColor(200, 200, 200);
-		doc.line(marginX - 55, finalY + 10, marginX, finalY + 10);
+		doc.line(marginX - 55, finalY + plusPosition + 10, marginX, finalY + plusPosition + 10);
 
 		// Total final
 		doc.setFontSize(14);
 		doc.setFont("helvetica", "bold");
 		doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-		doc.text("TOTAL:", marginX - 50, finalY + 18);
-		doc.text(formatARS(totalConIva), marginX, finalY + 18, { align: "right" });
+		doc.text("TOTAL:", marginX - 50, finalY + plusPosition + 17);
+		doc.text(formatARS(totalConIva), marginX, finalY + plusPosition + 17, { align: "right" });
 
 		// --- PIE DE PÁGINA ---
 		doc.setFontSize(8);
@@ -293,7 +305,14 @@ export function QuoteForm() {
     };
 
     const removeItem = (id: string) => setItems(items.filter(i => i.id !== id))
-    const totalQuote = items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
+
+    const subtotalQuote = items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
+    const discountAmount = useMemo(() => {
+        const d = parseFloat(discount) || 0
+        return (subtotalQuote * d) / 100
+    }, [subtotalQuote, discount])
+
+    const totalQuote = subtotalQuote - discountAmount
 
     return (
         <div className="min-h-screen bg-secondary/30">
@@ -404,6 +423,18 @@ export function QuoteForm() {
                                             <Checkbox id="bordePulido" checked={bordePulido} onCheckedChange={(v) => setBordePulido(!!v)} />
                                             <label htmlFor="bordePulido" className="text-sm font-medium leading-none cursor-pointer">Borde Pulido</label>
                                         </div>
+                                        {/* INPUT DE CALADOS AGREGADO AQUÍ */}
+										<div className="flex flex-col gap-2">
+												<Label htmlFor="calados" className="text-xs font-bold uppercase text-muted-foreground">Cant. de Calados</Label>
+												<Input 
+													id="calados"
+													type="number" 
+													min="0"
+													className="h-9 w-24 bg-background" 
+													value={calados} 
+													onChange={(e) => setCalados(e.target.value)} 
+												/>
+										</div>
                                     </div>
                                     {glassType === "templado" && (
                                         <div className="space-y-3">
@@ -415,18 +446,7 @@ export function QuoteForm() {
                                                 <Checkbox id="puntas" checked={puntasRedondeadas} onCheckedChange={(v) => setPuntasRedondeadas(!!v)} />
                                                 <label htmlFor="puntas" className="text-sm cursor-pointer">Puntas redondeadas</label>
                                             </div>
-											{/* INPUT DE CALADOS AGREGADO AQUÍ */}
-											<div className="flex flex-col gap-2">
-												<Label htmlFor="calados" className="text-xs font-bold uppercase text-muted-foreground">Cant. de Calados</Label>
-												<Input 
-													id="calados"
-													type="number" 
-													min="0"
-													className="h-9 w-24 bg-background" 
-													value={calados} 
-													onChange={(e) => setCalados(e.target.value)} 
-												/>
-											</div>
+											
                                         </div>
                                     )}
 
@@ -521,17 +541,48 @@ export function QuoteForm() {
                                     </div>
                                 )}
                             </div>
-
-                            <div className="p-5 bg-secondary/50 border-t">
-                                <div className="flex justify-between items-end mb-6">
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase text-muted-foreground">Total Estimado</p>
-                                        <p className="text-xs text-muted-foreground">Precios sin IVA</p>
-                                    </div>
-                                    <p className="text-3xl font-bold font-mono text-primary">{formatARS(totalQuote)}</p>
+                                <div className="flex items-center justify-between bg-background p-2 rounded-md border border-dashed">
+                                        <div className="flex items-center gap-2">
+                                            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">%</Badge>
+                                            <Label htmlFor="discount" className="text-[10px] font-bold uppercase">Aplicar Descuento</Label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Input 
+                                                id="discount"
+                                                type="number" 
+                                                className="h-8 w-16 text-right font-bold" 
+                                                value={discount}
+                                                onChange={(e) => setDiscount(e.target.value)}
+                                                min="0"
+                                                max="100"
+                                            />
+                                            <span className="text-xs font-bold">%</span>
+                                        </div>
                                 </div>
+                            <div className="p-5 bg-secondary/50 border-t">
+
+                                <div className="space-y-1">
+                                    <div className="flex justify-between text-xs text-muted-foreground">
+                                        <span>Subtotal:</span>
+                                        <span>{formatARS(subtotalQuote)}</span>
+                                    </div>
+                                    {parseFloat(discount) > 0 && (
+                                        <div className="flex justify-between text-xs text-emerald-600 font-medium">
+                                            <span>Descuento ({discount}%):</span>
+                                            <span>-{formatARS(discountAmount)}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between items-end pt-2">
+                                        <div>
+                                            <p className="text-[10px] font-bold uppercase text-muted-foreground">Total Estimado</p>
+                                            <p className="text-[10px] text-muted-foreground italic">Precios sin IVA</p>
+                                        </div>
+                                        <p className="text-3xl font-bold font-mono text-primary">{formatARS(totalQuote)}</p>
+                                    </div>
+                                </div>
+                                
                                 <Button 
-                                    className="w-full h-12 text-base font-bold" 
+                                    className="w-full mt-5 h-12 text-base font-bold" 
                                     disabled={items.length === 0} 
                                     onClick={() => setStep("checkout")}
                                 >
@@ -632,6 +683,8 @@ export function QuoteForm() {
                         onClick={() => { 
                             setStep("form"); 
                             setItems([]); 
+                            setDiscount("0")
+                            setBordePulido(false)
                             setCustomerData({name: "", phone: "", email: ""});
                         }}
                     >

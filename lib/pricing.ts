@@ -101,8 +101,7 @@ export const rawGlassData = [
     "Nombre vidrio": "ESPEJO 4mm",
     "precio para crudo": 25000.00,
     "espesor": 4
-  },
-  {
+  },  {
     "Nombre vidrio": "CATEDRAL PACIFICO 4mm",
     "precio para crudo": 15224.00,
     "Precio para DVH": 27100.00,
@@ -338,6 +337,7 @@ export function calculatePrice(
 
       const areaMinPVB = areaReal < 0.5 ? 0.5 : areaReal;
       unitPrice = v1Price + v2Price + (areaMinPVB * 79750);
+      if (options.calados) unitPrice += options.calados * 1500;
       break;
 
     case "dvh":
