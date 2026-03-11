@@ -318,6 +318,7 @@ export function calculatePrice(
   switch (type) {
     case "crudo":
       unitPrice = calculateBasePiece(mainGlass["Precio para DVH"] || 0, widthMm, heightMm, mainGlass.espesor, needsPolish, type);
+      if (options.calados) unitPrice += options.calados * 1500;
       break
     case "espejos":
     case "planchas":
@@ -351,6 +352,7 @@ export function calculatePrice(
       const perimetroM = ((widthMm + heightMm) * 2) / 1000;
       const costCamara = options.camaraMm === 12 ? 2500 : options.camaraMm === 9 ? 2000 : 1500;
       unitPrice = vi + ve + (perimetroM * costCamara);
+      if (options.calados) unitPrice += options.calados * 3000;
       break;
   }
 
