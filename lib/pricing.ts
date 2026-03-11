@@ -317,6 +317,8 @@ export function calculatePrice(
 
   switch (type) {
     case "crudo":
+      unitPrice = calculateBasePiece(mainGlass["Precio para DVH"] || 0, widthMm, heightMm, mainGlass.espesor, needsPolish, type);
+      break
     case "espejos":
     case "planchas":
       unitPrice = calculateBasePiece(mainGlass["precio para crudo"] || 0, widthMm, heightMm, mainGlass.espesor, needsPolish, type);
