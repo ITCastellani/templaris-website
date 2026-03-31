@@ -2,251 +2,251 @@
 export const rawGlassData = [
   {
     "Nombre vidrio": "FLOAT Incoloro 3mm",
-    "precio para crudo": 9582.00,
+    "precio para crudo": 10061.10,
     "espesor": 3
   },
   {
     "Nombre vidrio": "FLOAT Incoloro 4mm",
-    "precio para crudo": 11910.00,
-    "Precio para DVH": 16000.00,
-    "Precio para Laminado": 16000.00,
-    "Precio Templado": 29203.2,
+    "precio para crudo": 12505.50,
+    "Precio para DVH": 16800.00,
+    "Precio para Laminado": 16800.00,
+    "Precio Templado": 30663.36,
     "espesor": 4
   },
   {
     "Nombre vidrio": "FLOAT Incoloro 5mm",
-    "precio para crudo": 15562.00,
-    "Precio para DVH": 21200.00,
-    "Precio para Laminado": 21200.00,
-    "Precio Templado": 34700.00,
+    "precio para crudo": 16340.10,
+    "Precio para DVH": 22260.00,
+    "Precio para Laminado": 22260.00,
+    "Precio Templado": 36435.00,
     "espesor": 5
   },
   {
     "Nombre vidrio": "FLOAT Incoloro 6mm",
-    "precio para crudo": 19323.00,
-    "Precio para DVH": 26000.00,
-    "Precio para Laminado": 26000.00,
-    "Precio Templado": 37160.00,
+    "precio para crudo": 20289.15,
+    "Precio para DVH": 27300.00,
+    "Precio para Laminado": 27300.00,
+    "Precio Templado": 39018.00,
     "espesor": 6
   },
   {
     "Nombre vidrio": "FLOAT Incoloro 8mm",
-    "precio para crudo": 27636.00,
-    "Precio para DVH": 39400.00,
-    "Precio para Laminado": 39400.00,
-    "Precio Templado": 45407.00,
+    "precio para crudo": 29017.80,
+    "Precio para DVH": 41370.00,
+    "Precio para Laminado": 41370.00,
+    "Precio Templado": 47677.35,
     "espesor": 8
   },
   {
     "Nombre vidrio": "FLOAT Incoloro 10mm",
-    "precio para crudo": 36000.00,
-    "Precio para DVH": 50900.00,
-    "Precio para Laminado": 50900.00,
-    "Precio Templado": 51200.00,
+    "precio para crudo": 37800.00,
+    "Precio para DVH": 53445.00,
+    "Precio para Laminado": 53445.00,
+    "Precio Templado": 53760.00,
     "espesor": 10
   },
   {
     "Nombre vidrio": "FLOAT Incoloro 12mm",
-    "Precio Templado": 84600.00,
+    "Precio Templado": 88830.00,
     "espesor": 12
   },
   {
     "Nombre vidrio": "FLOAT Gris 4mm",
-    "precio para crudo": 18316.00,
-    "Precio para DVH": 29000.00,
-    "Precio para Laminado": 29000.00,
-    "Precio Templado": 43400.00,
+    "precio para crudo": 19231.80,
+    "Precio para DVH": 30450.00,
+    "Precio para Laminado": 30450.00,
+    "Precio Templado": 45570.00,
     "espesor": 4
   },
   {
     "Nombre vidrio": "FLOAT Gris 6mm",
-    "precio para crudo": 27531.00,
-    "Precio para DVH": 35000.00,
-    "Precio para Laminado": 35000.00,
-    "Precio Templado": 57100.00,
+    "precio para crudo": 28907.55,
+    "Precio para DVH": 36750.00,
+    "Precio para Laminado": 36750.00,
+    "Precio Templado": 59955.00,
     "espesor": 6
   },
   {
     "Nombre vidrio": "FLOAT Gris 8mm",
-    "precio para crudo": 38073.00,
-    "Precio para DVH": 56900.00,
-    "Precio para Laminado": 56900.00,
-    "Precio Templado": 68500.00,
+    "precio para crudo": 39976.65,
+    "Precio para DVH": 59745.00,
+    "Precio para Laminado": 59745.00,
+    "Precio Templado": 71925.00,
     "espesor": 8
   },
   {
     "Nombre vidrio": "FLOAT Gris 10mm",
-    "precio para crudo": 47624.00,
-    "Precio para DVH": 73800.00,
-    "Precio para Laminado": 73800.00,
-    "Precio Templado": 80365.00,
+    "precio para crudo": 50005.20,
+    "Precio para DVH": 77490.00,
+    "Precio para Laminado": 77490.00,
+    "Precio Templado": 84383.25,
     "espesor": 10
   },
   {
     "Nombre vidrio": "SOLAR NEUTRO LIGHT 6mm",
-    "Precio Templado": 57200.00,
+    "Precio Templado": 60060.00,
     "espesor": 6
   },
   {
     "Nombre vidrio": "CATEDRAL STIPOLITE - SYCAMORE",
-    "precio para crudo": 14499.58,
+    "precio para crudo": 15367.8,
     "espesor": 6
   },
   {
     "Nombre vidrio": "ESPEJO 3mm",
-    "precio para crudo": 20535.00,
+    "precio para crudo": 22793.85,
     "espesor": 3
   },
   {
     "Nombre vidrio": "ESPEJO 4mm",
-    "precio para crudo": 25000.00,
+    "precio para crudo": 27750.00,
     "espesor": 4
   },  {
     "Nombre vidrio": "CATEDRAL PACIFICO 4mm",
-    "precio para crudo": 15224.00,
-    "Precio para DVH": 27100.00,
-    "Precio para Laminado": 27100.00,
+    "precio para crudo": 15985.20,
+    "Precio para DVH": 28455.00,
+    "Precio para Laminado": 28455.00,
     "espesor": 4
   },
   {
     "Nombre vidrio": "CATEDRAL Opacid 4mm",
-    "precio para crudo": 46574.892,
-    "Precio para DVH": 68000.00,
-    "Precio para Laminado": 68000.00,
-    "Precio Templado": 87800.00,
+    "precio para crudo": 48903.6366,
+    "Precio para DVH": 71400.00,
+    "Precio para Laminado": 71400.00,
+    "Precio Templado": 92190.00,
     "espesor": 4
   },
   {
     "Nombre vidrio": "LAMINADO Incoloro 3+3",
-    "precio para crudo": 33337.00,
-    "Precio para DVH": 45400.00,
+    "precio para crudo": 35003.85,
+    "Precio para DVH": 47670.00,
     "espesor": 6
   },
   {
     "Nombre vidrio": "LAMINADO Incoloro 4+4",
-    "precio para crudo": 40046.24,
-    "Precio para DVH": 54500.00,
+    "precio para crudo": 42048.55,
+    "Precio para DVH": 57225.00,
     "espesor": 8
   },
   {
     "Nombre vidrio": "LAMINADO Incoloro 5+5",
-    "precio para crudo": 48455.68,
-    "Precio para DVH": 68800.00,
-    "Precio para Laminado": 68800.00,
+    "precio para crudo": 50878.464,
+    "Precio para DVH": 72240.00,
+    "Precio para Laminado": 72240.00,
     "Precio Templado": 0,
     "espesor": 10
   },
   {
     "Nombre vidrio": "LAMINADO Gris Oscuro 3+3",
-    "precio para crudo": 44755.5264,
+    "precio para crudo": 46993.30272,
     "Precio Templado": 0,
     "espesor": 6
   },
   {
     "Nombre vidrio": "LAMINADO Gris Oscuro 4+4",
-    "precio para crudo": 56405.44,
+    "precio para crudo": 59225.712,
     "Precio Templado": 0,
     "espesor": 8
   },
   {
     "Nombre vidrio": "LAMINADO Gris Oscuro 5+5",
-    "precio para crudo": 64120.4928,
+    "precio para crudo": 67326.5174,
     "Precio Templado": 0,
     "espesor": 10
   },
   {
     "Nombre vidrio": "LAMINADO Opalino 3+3",
-    "precio para crudo": 53111.96800000001,
+    "precio para crudo": 55767.5664,
     "Precio Templado": 0,
     "espesor": 6
   },
   {
     "Nombre vidrio": "TEMPLADO FLOAT INC 4mm",
-    "Precio para DVH": 29203.2,
-    "Precio para Laminado": 29203.2,
+    "Precio para DVH": 30663.36,
+    "Precio para Laminado": 30663.36,
     "espesor": 4
   },
   {
     "Nombre vidrio": "TEMPLADO FLOAT INC 5mm",
-    "Precio para DVH": 34700.00,
-    "Precio para Laminado": 34700.00,
+    "Precio para DVH": 36435.00,
+    "Precio para Laminado": 36435.00,
     "espesor": 5
   },
   {
     "Nombre vidrio": "TEMPLADO FLOAT INC 6mm",
-    "Precio para DVH": 37160.00,
-    "Precio para Laminado": 37160.00,
+    "Precio para DVH": 39018.00,
+    "Precio para Laminado": 39018.00,
     "espesor": 6
   },
   {
     "Nombre vidrio": "TEMPLADO FLOAT INC 8mm",
-    "Precio para DVH": 45407.00,
-    "Precio para Laminado": 45407.00,
+    "Precio para DVH": 47677.35,
+    "Precio para Laminado": 47677.35,
     "espesor": 8
   },
   {
     "Nombre vidrio": "TEMPLADO FLOAT INC 10mm",
-    "Precio para DVH": 51200.00,
-    "Precio para Laminado": 51200.00,
+    "Precio para DVH": 53760.00,
+    "Precio para Laminado": 53760.00,
     "espesor": 10
   },
   {
     "Nombre vidrio": "TEMPLADO FLOAT INC 12mm",
-    "Precio para DVH": 84600.00,
-    "Precio para Laminado": 84600.00,
+    "Precio para DVH": 88830.00,
+    "Precio para Laminado": 88830.00,
     "espesor": 12
   },
   {
     "Nombre vidrio": "TEMPLADO FLOAT Gris 4mm",
-    "Precio para DVH": 43400.00,
-    "Precio para Laminado": 43400.00,
+    "Precio para DVH": 45570.00,
+    "Precio para Laminado": 45570.00,
     "espesor": 4
   },
   {
     "Nombre vidrio": "TEMPLADO FLOAT Gris 6mm",
-    "Precio para DVH": 57100.00,
-    "Precio para Laminado": 57100.00,
+    "Precio para DVH": 59955.00,
+    "Precio para Laminado": 59955.00,
     "espesor": 6
   },
   {
     "Nombre vidrio": "TEMPLADO FLOAT Gris 8mm",
-    "Precio para DVH": 68500.00,
-    "Precio para Laminado": 68500.00,
+    "Precio para DVH": 71925.00,
+    "Precio para Laminado": 71925.00,
     "espesor": 8
   },
   {
     "Nombre vidrio": "TEMPLADO FLOAT Gris 10mm",
-    "Precio para DVH": 80365.00,
-    "Precio para Laminado": 80365.00,
+    "Precio para DVH": 84383.25,
+    "Precio para Laminado": 84383.25,
     "espesor": 10
   },
   {
     "Nombre vidrio": "TEMPLADO SOLAR NEUTRO LIGHT 6mm",
-    "Precio para DVH": 57200.00,
-    "Precio para Laminado": 57200.00,
+    "Precio para DVH": 60060.00,
+    "Precio para Laminado": 60060.00,
     "espesor": 6
   },
   {
     "Nombre vidrio": "TEMPLADO CATEDRAL Opacid 4mm",
-    "Precio para DVH": 87500.00,
-    "Precio para Laminado": 87500.00,
+    "Precio para DVH": 91875.00,
+    "Precio para Laminado": 91875.00,
     "espesor": 4
   },
   {
     "Nombre vidrio": "TEMPLADO CATEDRAL Opacid 8mm",
-    "Precio para DVH": 136600.00,
-    "Precio para Laminado": 136600.00,
+    "Precio para DVH": 143430.00,
+    "Precio para Laminado": 143430.00,
     "espesor": 8
   },
   {
     "Nombre vidrio": "TEMPLADO CATEDRAL Opacid 10mm",
-    "Precio para DVH": 163000.00,
-    "Precio para Laminado": 163000.00,
+    "Precio para DVH": 171150.00,
+    "Precio para Laminado": 171150.00,
     "espesor": 10
   },
   {
     "Nombre vidrio": "STIPOLITE 4mm",
-    "Precio para crudo": 10803.00,
+    "Precio para crudo": 11343.00,
     "espesor": 10
   }
   // ... (puedes seguir pegando el resto del JSON agregando el espesor numérico)
@@ -292,7 +292,7 @@ function calculateBasePiece(
 
   // 3. Borde pulido: SOLO se suma si shouldPolish es true
   if (shouldPolish) {
-    const costPerLinealMeter = thickness >= 12 ? 3000 : 1450;
+    const costPerLinealMeter = thickness >= 12 ? 3255 : 1627.5;
     price += perimeter * costPerLinealMeter;
   }
 
@@ -318,7 +318,7 @@ export function calculatePrice(
   switch (type) {
     case "crudo":
       unitPrice = calculateBasePiece(mainGlass["Precio para DVH"] || 0, widthMm, heightMm, mainGlass.espesor, needsPolish, type);
-      if (options.calados) unitPrice += options.calados * 1500;
+      if (options.calados) unitPrice += options.calados * 1575;
       break
     case "espejos":
     case "planchas":
@@ -328,9 +328,9 @@ export function calculatePrice(
     case "templado":
       // El templado siempre usa 'true' en pulido
       unitPrice = calculateBasePiece(mainGlass["Precio Templado"] || 0, widthMm, heightMm, mainGlass.espesor, needsPolish);
-      if (options.calados) unitPrice += options.calados * 1500;
-      if (options.pasaVoz) unitPrice += 8320;
-      if (options.puntasRedondeadas) unitPrice += 5200;
+      if (options.calados) unitPrice += options.calados * 1575;
+      if (options.pasaVoz) unitPrice += 8736;
+      if (options.puntasRedondeadas) unitPrice += 5460;
       break;
 
     case "laminado":
@@ -340,7 +340,7 @@ export function calculatePrice(
 
       const areaMinPVB = areaReal < 0.5 ? 0.5 : areaReal;
       unitPrice = v1Price + v2Price + (areaMinPVB * 79750);
-      if (options.calados) unitPrice += options.calados * 1500;
+      if (options.calados) unitPrice += options.calados * 1575;
       break;
 
     case "dvh":
@@ -352,7 +352,7 @@ export function calculatePrice(
       const perimetroM = ((widthMm + heightMm) * 2) / 1000;
       const costCamara = options.camaraMm === 12 ? 2500 : options.camaraMm === 9 ? 2000 : 1500;
       unitPrice = vi + ve + (perimetroM * costCamara);
-      if (options.calados) unitPrice += options.calados * 3000;
+      if (options.calados) unitPrice += options.calados * 3150;
       break;
   }
 
