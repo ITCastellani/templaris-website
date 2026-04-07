@@ -350,7 +350,7 @@ export function calculatePrice(
       const ve = calculateBasePiece(extG["Precio para DVH"] || 0, widthMm, heightMm, extG.espesor, needsPolish);
 
       const perimetroM = ((widthMm + heightMm) * 2) / 1000;
-      const costCamara = options.camaraMm === 12 ? 2500 : options.camaraMm === 9 ? 2000 : 1500;
+      const costCamara = options.camaraMm === 12 ? 6505 : options.camaraMm === 9 ? 5034 : 4520;
       unitPrice = vi + ve + (perimetroM * costCamara);
       if (options.calados) unitPrice += options.calados * 3150;
       break;
