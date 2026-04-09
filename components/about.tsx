@@ -40,6 +40,9 @@ export function About() {
               Somos una empresa del norte argentino dedicada a la fabricación, procesamiento,
               distribución y comercialización de vidrio plano para arquitectura y construcción.
             </p>
+            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
+              A su vez, somos distribuidores oficiales de VASA© y Climanet© en el norte argentino. Brindando soluciones innovadoras y eficientes gracias a nuestros lazos empresariales.
+            </p>
             <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
               Nacemos con una mirada moderna e industrial, orientada a brindar soluciones
               confiables en vidrio para profesionales y empresas que necesitan rapidez,
