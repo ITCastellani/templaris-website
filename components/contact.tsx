@@ -14,7 +14,7 @@ const contactInfo = [
   {
     icon: Mail,
     title: "Email",
-    detail: "info@templaris.com.ar",
+    detail: "ventas@templaris.com.ar",
   },
   {
     icon: Clock,

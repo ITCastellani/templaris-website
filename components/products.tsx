@@ -6,31 +6,37 @@ const products = [
     name: "Vidrio Templado",
     description:
       "Vidrio de seguridad sometido a tratamiento térmico que multiplica su resistencia mecánica y térmica. Ideal para fachadas, mamparas y aberturas.",
-    image: "/images/tempered-glass.jpg",
+    image: "/images/templado.jpg",
   },
   {
     name: "Vidrio Laminado",
     description:
       "Compuesto por dos o más capas de vidrio unidas por una lámina intermedia de PVB. Ofrece seguridad, control acústico y protección UV.",
-    image: "/images/laminated-glass.jpg",
+    image: "/images/LAMINADO.jpg",
   },
   {
     name: "Vidrio Crudo",
     description:
       "Vidrio plano sin tratamiento, disponible en diversos espesores y dimensiones. Base para procesamiento o uso directo en aplicaciones de baja exigencia.",
-    image: "/images/raw-glass.jpg",
+    image: "/images/FLOAT.png",
   },
   {
     name: "DVH",
     description:
       "Doble Vidriado Hermético: dos paños de vidrio separados por una cámara de aire sellada. Máximo aislamiento térmico y acústico.",
-    image: "/images/dvh-glass.jpg",
+    image: "/images/DVH.jpg",
   },
   {
     name: "Espejos",
     description:
       "Espejos de calidad industrial para uso arquitectónico, comercial y decorativo. Disponibles en diversas medidas y espesores.",
     image: "/images/mirrors.jpg",
+  },
+  {
+    name: "Canchas de Padel",
+    description:
+      "La mejor opción para tu cancha de padel. Con entregas ultra rapidas de una o dos semanas aproximadamente.",
+    image: "/images/CANCHA PADEL.png",
   },
 ]
 

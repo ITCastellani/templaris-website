@@ -11,6 +11,7 @@ const navLinks = [
   { href: "/#productos", label: "Productos" },
   { href: "/#servicios", label: "Servicios" },
   { href: "/#valores", label: "Valores" },
+  { href: "/canchas-padel", label: "Canchas de Padel" },
   { href: "/#contacto", label: "Contacto" },
 ]
 

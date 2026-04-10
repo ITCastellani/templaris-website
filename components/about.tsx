@@ -67,7 +67,7 @@ export function About() {
           <div className="relative">
             <div className="aspect-[4/3] overflow-hidden rounded-lg">
               <Image
-                src="/images/factory.jpg"
+                src="/images/FOTO HORNO TEMPLADO.png"
                 alt="Planta industrial de Templaris en Salta"
                 fill
                 className="object-cover"

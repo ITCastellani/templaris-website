@@ -1,4 +1,6 @@
 import Link from "next/link"
+import { TemplarisLogo } from "@/components/templaris-logo-white"
+
 
 export function Footer() {
   return (
@@ -7,13 +9,7 @@ export function Footer() {
         <div className="grid gap-8 lg:grid-cols-4">
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <rect width="32" height="32" rx="4" fill="#0F49B5" />
-                <path d="M8 8h16v2H17v14h-2V10H8V8z" fill="white" />
-              </svg>
-              <span className="text-lg font-bold tracking-tight text-accent-foreground font-mono">
-                TEMPLARIS
-              </span>
+              <TemplarisLogo className="h-[80px] w-auto lg:h-[120px]" />
             </div>
             <p className="mt-4 max-w-md text-sm text-accent-foreground/60 leading-relaxed">
               Fabricación, procesamiento, distribución y comercialización de vidrio plano
