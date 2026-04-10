@@ -72,14 +72,14 @@ export function Features() {
 
       <div className="mt-[50] p-8 inset-0 z-0">
         <video
+          src="/videos/videoPromo.mp4"
           autoPlay
           loop
           muted
           playsInline
           className="h-[55%] w-full object-cover brightness-75"
         >
-          <source src="/videos/videoPromo.mp4" type="video/mp4" />
-          Tu navegador no soporta el elemento de video.
+
         </video>
         {/* 2. Overlay para legibilidad (oscurece un poco el video) */}
         <div className="absolute inset-0 bg-black/40" />

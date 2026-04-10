@@ -13,9 +13,9 @@ export function Hero() {
           muted
           playsInline
           className="h-full w-full object-cover brightness-95"
+          src="/videos/bannerTemplaris.mp4"
         >
-          <source src="/videos/bannerTemplaris.mp4" type="video/mp4" />
-          Tu navegador no soporta el elemento de video.
+
         </video>
         {/* 2. Overlay para legibilidad (oscurece un poco el video) */}
         <div className="absolute inset-0 bg-black/10" />
