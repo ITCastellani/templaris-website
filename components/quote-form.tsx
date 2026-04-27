@@ -37,6 +37,7 @@ interface QuoteItem {
   details: string;
   price: number;
   quantity: number;
+  peso: number
 }
 
 const getBase64ImageFromURL = (url: string): Promise<string> => {
@@ -148,13 +149,14 @@ export function QuoteForm() {
 			item.description,
 			item.details,
 			item.quantity.toString(),
+            `${item.peso || "No provisto"} Kg`,
 			formatARS(item.price),
 			formatARS(item.price * item.quantity)
 		]);
 
 		autoTable(doc, {
 			startY: 85,
-			head: [['Producto', 'Detalles', 'Cant.', 'Precio Unit.', 'Subtotal']],
+			head: [['Producto', 'Detalles', 'Cant.', 'Peso', 'Precio Unit.', 'Subtotal']],
 			body: tableRows,
 			theme: 'striped',
 			headStyles: {
@@ -168,8 +170,9 @@ export function QuoteForm() {
 				0: { cellWidth: 40 },
 				1: { cellWidth: 'auto' },
 				2: { halign: 'center' },
-				3: { halign: 'right' },
-				4: { halign: 'right', fontStyle: 'bold' }
+                3: { halign: 'center' },
+				4: { halign: 'right' },
+				5: { halign: 'right', fontStyle: 'bold' }
 			},
 			styles: { fontSize: 9, cellPadding: 5 }
 		});
@@ -277,7 +280,8 @@ export function QuoteForm() {
 			description: fullDescription, // <-- Aquí guardamos el nombre largo
 			details: `${width}x${height}mm | ${glassType.toUpperCase()} ${urgent ? '(Urgente)' : ''}`,
 			price: currentCalculation.unitPrice,
-			quantity: parseInt(quantity)
+			quantity: parseInt(quantity),
+            peso: currentCalculation.peso
 		};
 		
 		setItems([...items, newItem]);
@@ -528,6 +532,7 @@ export function QuoteForm() {
                                                 <div className="space-y-1">
                                                     <p className="font-bold text-sm leading-none">{item.description}</p>
                                                     <p className="text-[11px] text-muted-foreground">{item.details}</p>
+                                                    {item.peso && <p className="text-[11px] text-muted-foreground">Peso: {item.peso} Kg</p>}
                                                     <p className="text-xs font-semibold">{item.quantity} un. x {formatARS(item.price)}</p>
                                                 </div>
                                                 <div className="flex items-center gap-3">

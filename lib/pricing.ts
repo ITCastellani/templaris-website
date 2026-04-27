@@ -306,10 +306,18 @@ export function calculatePrice(
   heightMm: number,
   quantity: number,
   options: CalculationOptions
-): { areaM2: number; unitPrice: number; totalPrice: number } {
+): { areaM2: number; unitPrice: number; totalPrice: number; peso: number} {
   const mainGlass = rawGlassData[glassIndex] as any;
   const areaReal = (widthMm / 1000) * (heightMm / 1000);
   let unitPrice = 0;
+  let peso = 0
+
+  if(type === 'dvh'){
+    const espesorGlass = (rawGlassData[options.vidrioSecundarioIndex ?? glassIndex] as any);
+    peso = ((areaReal * 2.5 * mainGlass.espesor) + (areaReal * 2.5 * espesorGlass.espesor)) * quantity
+  }else{
+    peso = (areaReal * 2.5 * mainGlass.espesor) * quantity
+  }
 
   // REGLA: El templado SIEMPRE lleva borde pulido por proceso. 
   // Para los demás, depende de lo que elija el usuario.
@@ -361,7 +369,8 @@ export function calculatePrice(
   return {
     areaM2: areaReal,
     unitPrice,
-    totalPrice: unitPrice * quantity
+    totalPrice: unitPrice * quantity,
+    peso: peso
   };
 }
 
